@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinite Platformer - Spike Clusters & High Score</title>
+<style>
+  body { margin:0; overflow:hidden; background:linear-gradient(to bottom,#87CEEB,#E0F7FA); font-family:'Arial Rounded MT Bold','Arial',sans-serif;}
+  canvas{display:block;}
+  #ui{position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.8);padding:15px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.2);}
+  #score{position:absolute;top:20px;right:20px;background:rgba(0,0,0,0.7);color:white;padding:10px 15px;border-radius:20px;font-size:18px;}
+  #highScore{position:absolute;top:60px;right:20px;background:rgba(0,0,0,0.7);color:white;padding:10px 15px;border-radius:20px;font-size:18px;}
+  #gameOver{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.95);padding:30px;border-radius:15px;text-align:center;box-shadow:0 0 30px rgba(0,0,0,0.3);display:none;z-index:100;}
+  button{background:#4CAF50;color:white;border:none;padding:12px 25px;border-radius:25px;font-size:16px;cursor:pointer;margin-top:15px;transition:background 0.3s;}
+  button:hover{background:#388E3C;}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="ui">
+<h2>Controls</h2>
+<p>SPACE or UP ARROW to jump</p>
+</div>
+<div id="score">Score: 0</div>
+<div id="highScore">High Score: 0</div>
+<div id="gameOver">
+<h2>Game Over!</h2>
+<p>Your score: <span id="finalScore">0</span></p>
+<p>High Score: <span id="finalHighScore">0</span></p>
+<button id="playAgainBtn">Play Again</button>
+</div>
+
+<script>
+let canvas, ctx;
+let player, platforms, particles;
+let score = 0, scrollSpeed = 4;
+let platformGap = 220, platformMinWidth = 120, platformMaxWidth = 200;
+let gameRunning = true, animationId;
+
+// Get high score from localStorage
+let highScore = localStorage.getItem("highScore") ? parseInt(localStorage.getItem("highScore")) : 0;
+document.getElementById('highScore').textContent = "High Score: " + highScore;
+
+function initGame(){
+  canvas=document.getElementById("gameCanvas");
+  ctx=canvas.getContext("2d");
+  resizeCanvas();
+
+  player={
+    x:canvas.width/2-20, y:canvas.height-150,
+    width:40, height:40, color:"#FF5252",
+    dy:0, gravity:0.5, jumpPower:-14,
+    onGround:false, maxJumpFrames:20, jumpFrameCount:0,
+    isJumping:false
+  };
+
+  platforms=[]; particles=[];
+  createInitialPlatforms();
+
+  document.removeEventListener("keydown", handleKeyDown);
+  document.removeEventListener("keyup", handleKeyUp);
+  document.getElementById('playAgainBtn').removeEventListener('click', resetGame);
+  window.removeEventListener('resize', resizeCanvas);
+
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("keyup", handleKeyUp);
+  document.getElementById('playAgainBtn').addEventListener('click', resetGame);
+  window.addEventListener('resize', resizeCanvas);
+
+  score = 0; 
+  document.getElementById('score').textContent = 'Score: 0';
+  document.getElementById('highScore').textContent = "High Score: " + highScore;
+  document.getElementById('gameOver').style.display='none';
+  gameRunning=true;
+  if(animationId) cancelAnimationFrame(animationId);
+  gameLoop();
+}
+
+// Input
+function handleKeyDown(e){
+  if((e.code==="Space"||e.code==="ArrowUp") && player.onGround && gameRunning){
+    player.dy=player.jumpPower;
+    player.onGround=false;
+    player.isJumping=true;
+    player.jumpFrameCount=0;
+  }
+}
+function handleKeyUp(e){ if((e.code==="Space"||e.code==="ArrowUp") && player.isJumping) player.isJumping=false; }
+
+function resizeCanvas(){
+  if(canvas){ canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    if(gameRunning && player) player.y=canvas.height-150;
+  }
+}
+
+function resetGame(){ initGame(); }
+
+// Platforms
+function createInitialPlatforms(){
+  platforms.push({x:canvas.width/2-200,y:canvas.height-100,width:400,height:20,color:"#4CAF50",type:"normal",spikePositions:[]});
+  let lastX=platforms[0].x+platforms[0].width;
+  let lastY=platforms[0].y;
+  for(let i=0;i<8;i++){
+    let nextY=lastY+(Math.random()*100-50);
+    nextY=Math.max(canvas.height-300,Math.min(canvas.height-80,nextY));
+    let width=platformMinWidth+Math.random()*(platformMaxWidth-platformMinWidth);
+    let type=Math.random()<0.3?"falling":"normal"; 
+    let color=type==="falling"?"#FF3B3B":"#4CAF50";
+    let spikePositions=[];
+    if(Math.random()<0.3){ 
+      let clusterSize=Math.floor(4+Math.random()*2); 
+      let startX=Math.random()*(width-10*clusterSize);
+      for(let s=0;s<clusterSize;s++){ spikePositions.push(startX+s*10); }
+    }
+    platforms.push({x:lastX+platformGap,y:nextY,width:width,height:20,color:color,type:type,isFalling:false,spikePositions:spikePositions});
+    lastX=platforms[platforms.length-1].x; lastY=platforms[platforms.length-1].y;
+  }
+}
+
+// Draw
+function drawRoundedRect(x,y,w,h,r,color){
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+}
+function drawPlayer(){
+  let tilt=player.dy*0.03;
+  ctx.save();
+  ctx.translate(player.x+player.width/2,player.y+player.height/2);
+  ctx.rotate(tilt);
+  drawRoundedRect(-player.width/2,-player.height/2,player.width,player.height,10,player.color);
+  ctx.fillStyle="#333"; ctx.beginPath(); ctx.arc(-player.width/2+player.width*0.7,-player.height/2+player.height*0.3,5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="#FFF"; ctx.beginPath(); ctx.arc(-player.width/2+player.width*0.68,-player.height/2+player.height*0.28,2,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawPlatform(p){
+  drawRoundedRect(p.x,p.y,p.width,p.height,10,p.color);
+  ctx.fillStyle="#388E3C"; ctx.fillRect(p.x,p.y,p.width,5);
+
+  if(p.spikePositions.length>0){
+    ctx.fillStyle="#FF0000";
+    for(let pos of p.spikePositions){
+      ctx.beginPath();
+      ctx.moveTo(p.x+pos,p.y);
+      ctx.lineTo(p.x+pos+5,p.y-10);
+      ctx.lineTo(p.x+pos+10,p.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+
+// Particles
+function spawnLandingParticles(x,y){
+  for(let i=0;i<6;i++){
+    particles.push({x:x,y:y,dx:(Math.random()-0.5)*4,dy:Math.random()*-2,alpha:1,radius:2+Math.random()*2});
+  }
+}
+function updateParticles(){
+  for(let i=particles.length-1;i>=0;i--){
+    let p=particles[i]; p.x+=p.dx; p.y+=p.dy; p.dy+=0.1; p.alpha-=0.03;
+    if(p.alpha<=0) particles.splice(i,1);
+    else{ctx.fillStyle=`rgba(255,255,255,${p.alpha})`; ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fill();}
+  }
+}
+
+// Game Loop
+function gameLoop(){
+  if(!gameRunning) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#87CEEB"; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  if(player.isJumping && player.jumpFrameCount<player.maxJumpFrames){
+    player.dy=player.jumpPower*(1-player.jumpFrameCount/player.maxJumpFrames/1.5);
+    player.jumpFrameCount++;
+  }
+
+  player.dy+=player.gravity;
+  player.y+=player.dy;
+  player.onGround=false;
+
+  for(let plat of platforms){
+    if(player.x<plat.x+plat.width && player.x+player.width>plat.x &&
+       player.y+player.height>plat.y && player.y+player.height<plat.y+plat.height+player.dy){
+      player.y=plat.y-player.height; player.dy=0; player.onGround=true; player.isJumping=false;
+      spawnLandingParticles(player.x+player.width/2, plat.y);
+      if(plat.type==="falling" && !plat.isFalling){
+        plat.isFalling=true;
+        setTimeout(()=>{plat.dy=2;},100);
+      }
+    }
+
+    for(let pos of plat.spikePositions){
+      if(player.x+player.width > plat.x+pos && player.x < plat.x+pos+10 &&
+         player.y+player.height > plat.y-10){
+        endGame(); return;
+      }
+    }
+  }
+
+  for(let plat of platforms){ plat.x-=scrollSpeed; if(plat.isFalling) plat.y+=(plat.dy||0); }
+
+  score+=scrollSpeed; 
+  document.getElementById('score').textContent='Score: '+Math.floor(score/10);
+
+  if(score/10 > highScore){ 
+    highScore=Math.floor(score/10); 
+    localStorage.setItem("highScore",highScore);
+    document.getElementById('highScore').textContent="High Score: "+highScore;
+  }
+
+  platforms=platforms.filter(p=>p.x+p.width>0 && p.y<canvas.height+100);
+
+  if(platforms.length<10){
+    let lastPlat=platforms[platforms.length-1];
+    let nextY=lastPlat.y+(Math.random()*100-50);
+    nextY=Math.max(canvas.height-300,Math.min(canvas.height-80,nextY));
+    let width=platformMinWidth+Math.random()*(platformMaxWidth-platformMinWidth);
+    let type=Math.random()<0.3?"falling":"normal";
+    let color=type==="falling"?"#FF3B3B":"#4CAF50";
+    let spikePositions=[];
+    if(Math.random()<0.3){ 
+      let clusterSize=Math.floor(4+Math.random()*2);
+      let startX=Math.random()*(width-10*clusterSize);
+      for(let s=0;s<clusterSize;s++){ spikePositions.push(startX+s*10); }
+    }
+    platforms.push({x:lastPlat.x+platformGap,y:nextY,width:width,height:20,color:color,type:type,isFalling:false,spikePositions:spikePositions});
+  }
+
+  for(let plat of platforms) drawPlatform(plat);
+  drawPlayer();
+  updateParticles();
+
+  if(player.y>canvas.height){ endGame(); return; }
+
+  animationId=requestAnimationFrame(gameLoop);
+}
+
+function endGame(){
+  gameRunning=false;
+  document.getElementById('finalScore').textContent=Math.floor(score/10);
+  document.getElementById('finalHighScore').textContent=highScore;
+  document.getElementById('gameOver').style.display='block';
+}
+
+window.onload=initGame;
+</script>
+</body>
+</html>
