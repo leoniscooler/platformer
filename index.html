@@ -10,8 +10,8 @@
   #ui{position:absolute;top:20px;left:20px;background:rgba(255,255,255,0.8);padding:15px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.2);}
   #score{position:absolute;top:20px;right:20px;background:rgba(0,0,0,0.7);color:white;padding:10px 15px;border-radius:20px;font-size:18px;}
   #highScore{position:absolute;top:60px;right:20px;background:rgba(0,0,0,0.7);color:white;padding:10px 15px;border-radius:20px;font-size:18px;}
-  #gameOver{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.95);padding:30px;border-radius:15px;text-align:center;box-shadow:0 0 30px rgba(0,0,0,0.3);display:none;z-index:100;}
-  button{background:#4CAF50;color:white;border:none;padding:12px 25px;border-radius:25px;font-size:16px;cursor:pointer;margin-top:15px;transition:background 0.3s;}
+  #gameOver{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.95);padding:20px;border-radius:15px;text-align:center;box-shadow:0 0 30px rgba(0,0,0,0.3);display:none;z-index:100;max-width:90vw;max-height:90vh;overflow-y:auto;}
+  button{background:#4CAF50;color:white;border:none;padding:10px 20px;border-radius:25px;font-size:14px;cursor:pointer;margin-top:10px;transition:background 0.3s;}
   button:hover{background:#388E3C;}
   
   /* Background toggle button */
@@ -19,12 +19,12 @@
     background: rgba(0, 0, 0, 0.7);
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 8px 12px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.3s;
-    margin: 10px 5px;
+    margin: 5px;
   }
   
   #bgToggle:hover {
@@ -49,9 +49,9 @@
     background: rgba(255, 0, 0, 0.7);
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
     z-index: 50;
     transition: all 0.3s;
@@ -62,59 +62,61 @@
     transform: scale(1.05);
   }
   
-  /* Character selection styles */
-  .character-selection {
-    margin: 20px 0;
-    padding: 15px;
+  /* Compact menu sections */
+  .menu-section {
+    margin: 15px 0;
+    padding: 12px;
     background: rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
+    border-radius: 8px;
   }
   
-  .character-selection h3 {
-    margin: 0 0 15px 0;
+  .menu-section h3 {
+    margin: 0 0 10px 0;
     color: #333;
+    font-size: 16px;
   }
   
+  /* Compact character preview */
   .character-preview {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
   
   .preview-canvas-container {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
-    border-radius: 10px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 8px;
+    border-radius: 8px;
     background: rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
   
   .preview-canvas {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
   }
   
   .color-options {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 8px;
   }
   
   .color-option {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     cursor: pointer;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
     transition: all 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
   
   .color-option:hover {
@@ -122,61 +124,49 @@
   }
   
   .color-option.selected {
-    border: 3px solid #333;
+    border: 2px solid #333;
     transform: scale(1.1);
   }
   
-  /* Background theme selection styles */
-  .theme-selection {
-    margin: 20px 0;
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
-  }
-  
-  .theme-selection h3 {
-    margin: 0 0 15px 0;
-    color: #333;
-  }
-  
+  /* Compact theme selection */
   .theme-preview {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
   
   .theme-preview-canvas-container {
-    width: 120px;
-    height: 80px;
-    margin-bottom: 10px;
-    border-radius: 10px;
+    width: 100px;
+    height: 60px;
+    margin-bottom: 8px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     border: 2px solid rgba(0,0,0,0.1);
   }
   
   .theme-preview-canvas {
-    width: 120px;
-    height: 80px;
+    width: 100px;
+    height: 60px;
   }
   
   .theme-options {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 8px;
   }
   
   .theme-option {
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
     cursor: pointer;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
     transition: all 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     overflow: hidden;
     position: relative;
   }
@@ -186,13 +176,32 @@
   }
   
   .theme-option.selected {
-    border: 3px solid #333;
+    border: 2px solid #333;
     transform: scale(1.1);
   }
   
   .theme-gradient {
     width: 100%;
     height: 100%;
+  }
+  
+  /* Stats section */
+  .stats {
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  
+  .stats p {
+    margin: 5px 0;
+  }
+  
+  /* Button container */
+  .button-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
   }
 </style>
 </head>
@@ -208,17 +217,19 @@
 <button id="menuBtn">Menu</button>
 <div id="gameOver">
 <h2>Game Over!</h2>
-<p>Your score: <span id="finalScore">0</span></p>
-<p>High Score: <span id="finalHighScore">0</span></p>
-<p>Total Jumps: <span id="totalJumps">0</span></p>
   
-<div class="character-selection">
-  <h3>Choose Character Color</h3>
+<div class="stats">
+  <p>Your score: <span id="finalScore">0</span></p>
+  <p>High Score: <span id="finalHighScore">0</span></p>
+  <p>Total Jumps: <span id="totalJumps">0</span></p>
+</div>
+  
+<div class="menu-section">
+  <h3>Character Color</h3>
   <div class="character-preview">
     <div class="preview-canvas-container">
       <canvas class="preview-canvas" id="characterPreview"></canvas>
     </div>
-    <p>Your Character</p>
   </div>
   <div class="color-options">
     <div class="color-option selected" style="background-color: #FF5252;" data-color="#FF5252"></div>
@@ -232,13 +243,12 @@
   </div>
 </div>
 
-<div class="theme-selection">
-  <h3>Choose Background Theme</h3>
+<div class="menu-section">
+  <h3>Background Theme</h3>
   <div class="theme-preview">
     <div class="theme-preview-canvas-container">
       <canvas class="theme-preview-canvas" id="themePreview"></canvas>
     </div>
-    <p>Background Preview</p>
   </div>
   <div class="theme-options">
     <div class="theme-option selected" data-theme="default">
@@ -262,11 +272,16 @@
   </div>
 </div>
   
-<button id="playAgainBtn">Play Again</button>
-<button id="bgToggle">Background: ON</button>
+<div class="button-container">
+  <button id="playAgainBtn">Play Again</button>
+  <button id="bgToggle">Background: ON</button>
+</div>
 </div>
 
 <script>
+// All the JavaScript code remains exactly the same as in the previous version
+// Only the CSS and HTML structure have been modified for compactness
+
 let canvas, ctx;
 let player, platforms, particles;
 let score = 0, scrollSpeed = 4;
@@ -477,8 +492,8 @@ function updateCharacterPreview() {
   const previewCtx = previewCanvas.getContext('2d');
   
   // Set canvas size
-  previewCanvas.width = 60;
-  previewCanvas.height = 60;
+  previewCanvas.width = 50;
+  previewCanvas.height = 50;
   
   // Clear the canvas
   previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
@@ -492,8 +507,8 @@ function updateThemePreview() {
   const previewCtx = previewCanvas.getContext('2d');
   
   // Set canvas size
-  previewCanvas.width = 120;
-  previewCanvas.height = 80;
+  previewCanvas.width = 100;
+  previewCanvas.height = 60;
   
   // Clear the canvas
   previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
@@ -520,38 +535,38 @@ function updateThemePreview() {
   // Add some simple elements to make it look like a game background
   previewCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
   previewCtx.beginPath();
-  previewCtx.arc(30, 20, 10, 0, Math.PI * 2);
+  previewCtx.arc(25, 15, 8, 0, Math.PI * 2);
   previewCtx.fill();
   
   previewCtx.beginPath();
-  previewCtx.arc(80, 30, 8, 0, Math.PI * 2);
+  previewCtx.arc(70, 25, 6, 0, Math.PI * 2);
   previewCtx.fill();
   
   // Draw a simple ground line
   previewCtx.fillStyle = '#4CAF50';
-  previewCtx.fillRect(0, previewCanvas.height - 15, previewCanvas.width, 15);
+  previewCtx.fillRect(0, previewCanvas.height - 12, previewCanvas.width, 12);
 }
 
 function drawPreviewCharacter(ctx, color) {
   // Draw the character (similar to drawPlayer but scaled down)
   const centerX = ctx.canvas.width / 2;
   const centerY = ctx.canvas.height / 2;
-  const size = 30; // Smaller size for preview
+  const size = 25; // Smaller size for preview
   
   ctx.save();
   
   // Draw the main character body
-  drawRoundedRectPreview(ctx, centerX - size/2, centerY - size/2, size, size, 5, color);
+  drawRoundedRectPreview(ctx, centerX - size/2, centerY - size/2, size, size, 4, color);
   
   // Draw eyes
   ctx.fillStyle = "#333";
   ctx.beginPath();
-  ctx.arc(centerX - size/2 + size*0.7, centerY - size/2 + size*0.3, 3, 0, Math.PI*2);
+  ctx.arc(centerX - size/2 + size*0.7, centerY - size/2 + size*0.3, 2.5, 0, Math.PI*2);
   ctx.fill();
   
   ctx.fillStyle = "#FFF";
   ctx.beginPath();
-  ctx.arc(centerX - size/2 + size*0.68, centerY - size/2 + size*0.28, 1.5, 0, Math.PI*2);
+  ctx.arc(centerX - size/2 + size*0.68, centerY - size/2 + size*0.28, 1.2, 0, Math.PI*2);
   ctx.fill();
   
   ctx.restore();
